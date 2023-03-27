@@ -2,6 +2,8 @@
     <string name="app_name">Tipper</string>
     <string name="tip_calculator_heading">Calculate Tip</string>
     <string name="service_cost">Cost of Service</string>
-    <string name="bill_percentage">Bill Amount</string>
+    <string name="bill_amount">Bill Amount:  %s</string>
     <string name="tip_amount">Tip amount: %s</string>
+    <string name="random_bill">Generate Random Bill</string>
+    <string name="total_amount">Total Amount:  %s</string>
 </resources>

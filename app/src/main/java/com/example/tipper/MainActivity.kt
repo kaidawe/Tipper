@@ -5,10 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,13 +42,24 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun TipCalculatorScreen() {
     var serviceCostAmountInput by remember { mutableStateOf("") }
+    var tipPercent by remember { mutableStateOf(15.0) }
+
     val amount = serviceCostAmountInput.toDoubleOrNull() ?: 0.0
-    val tip = calculateTip(amount)
+    val tip = calculateTip(amount, tipPercent)
+    val totalAmount = remember(amount, tip) { amount + tip }
 
     Column(
         modifier = Modifier.padding(32.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        Button(
+            onClick = { serviceCostAmountInput = generateRandomBill() },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+        {
+            Text(text = stringResource(R.string.random_bill))
+        }
+        Spacer(Modifier.height(24.dp))
         Text(
             text = stringResource(R.string.tip_calculator_heading),
             fontSize = 24.sp,
@@ -63,21 +71,87 @@ fun TipCalculatorScreen() {
             onValueChange = { serviceCostAmountInput = it }
         )
         Spacer(Modifier.height(24.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            TipPercentButton(
+                text = "10%",
+                isSelected = tipPercent == 10.0,
+                onClick = { tipPercent = 10.0 }
+            )
+            TipPercentButton(
+                text = "15%",
+                isSelected = tipPercent == 15.0,
+                onClick = { tipPercent = 15.0 }
+            )
+            TipPercentButton(
+                text = "18%",
+                isSelected = tipPercent == 18.0,
+                onClick = { tipPercent = 18.0 }
+            )
+            TipPercentButton(
+                text = "20%",
+                isSelected = tipPercent == 20.0,
+                onClick = { tipPercent = 20.0 }
+            )
+
+        }
+        Spacer(Modifier.height(60.dp))
         Text(
-            text = stringResource(R.string.tip_amount, tip),
-            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = stringResource(R.string.bill_amount, NumberFormat.getCurrencyInstance().format(amount)),
+            modifier = Modifier.align(Alignment.End),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
+        Text(
+            text = stringResource(R.string.tip_amount, NumberFormat.getCurrencyInstance().format(tip)),
+            modifier = Modifier.align(Alignment.End),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Divider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
+        )
+        Text (
+            text = stringResource(R.string.total_amount, NumberFormat.getCurrencyInstance().format(totalAmount)),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.End)
+        )
+        Spacer(Modifier.height(24.dp))
     }
+}
+
+
+@Composable
+fun TipPercentButton(text: String, isSelected: Boolean, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier.size(72.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = if (isSelected) MaterialTheme.colors.secondary else MaterialTheme.colors.primary
+        )
+    ) {
+        Text(
+            text = text,
+            color = if (isSelected) MaterialTheme.colors.onSecondary else MaterialTheme.colors.onPrimary
+        )
+    }
+}
+
+//Create button to generate a random bill
+private fun generateRandomBill(): String {
+    return (0..1000).random().toString()
 }
 
 private fun calculateTip(
     amount: Double,
     tipPercent: Double = 15.0
-): String {
-    val tip = tipPercent / 100 * amount
-    return NumberFormat.getCurrencyInstance().format(tip)
+): Double {
+    return tipPercent / 100 * amount
 }
 
 @Composable
